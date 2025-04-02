@@ -26,27 +26,21 @@ def send_email(subject, body):
     except Exception as e:
         print(f"Failed to send email: {e}")
 
-def create_zip_backup(source_folder, destination_folder):
+def create_backup(source_folder, destination_folder):
     try:
         if not os.path.exists(destination_folder):
             os.makedirs(destination_folder)
         
         date_str = datetime.datetime.now().strftime("%Y-%m-%d")
-        backup_name = f"backup_{date_str}.zip"
+        backup_name = f"backup_{date_str}"
         backup_path = os.path.join(destination_folder, backup_name)
         
         # Check if a backup of the same date already exists and delete it
         if os.path.exists(backup_path):
-            os.remove(backup_path)
+            shutil.rmtree(backup_path)
             print(f"Deleted existing backup: {backup_path}")
         
-        with zipfile.ZipFile(backup_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
-            for root, _, files in os.walk(source_folder):
-                for file in files:
-                    file_path = os.path.join(root, file)
-                    arcname = os.path.relpath(file_path, source_folder)
-                    zipf.write(file_path, arcname)
-        
+        shutil.copytree(source_folder, backup_path)
         print(f"Backup created: {backup_path}")
         return backup_name, None
     except Exception as e:
@@ -57,32 +51,32 @@ def create_zip_backup(source_folder, destination_folder):
 def cleanup_old_backups(destination_folder, days=5):
     deleted_files = []
     cutoff_date = datetime.datetime.now() - datetime.timedelta(days=days)
-    print(f"Cut of time is {cutoff_date}")
+    
     if not os.path.exists(destination_folder):
         return deleted_files
     
     for filename in os.listdir(destination_folder):
         file_path = os.path.join(destination_folder, filename)
-        print(f"    file_path is {file_path}")
-        if filename.startswith("backup_") and filename.endswith(".zip"):
+        
+        if filename.startswith("backup_"):
             file_mod_time = datetime.datetime.fromtimestamp(os.path.getmtime(file_path))
-            print(f"    file_mod_time is {file_mod_time}")
+            
             if file_mod_time < cutoff_date:
-                os.remove(file_path)
+                shutil.rmtree(file_path)
                 deleted_files.append(filename)
                 print(f"Deleted old backup: {file_path}")
     
     return deleted_files
 
 # Run backup and cleanup
-#backup_file, error_message = create_zip_backup(SOURCE_FOLDER, DESTINATION_FOLDER)
+backup_file, error_message = create_backup(SOURCE_FOLDER, DESTINATION_FOLDER)
 deleted_files = cleanup_old_backups(DESTINATION_FOLDER)
 
 # Prepare email summary
 subject = "Backup Summary"
 body = ""
 if backup_file:
-    body += f"Backup file created: {backup_file}\n"
+    body += f"Backup folder created: {backup_file}\n"
 if deleted_files:
     body += f"Deleted old backups: {', '.join(deleted_files)}\n"
 if error_message:
