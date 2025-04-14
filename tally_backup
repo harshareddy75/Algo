@@ -9,8 +9,8 @@ SOURCE_FOLDER = "C:/Users/Lenovo!/Desktop/SIDPL"  # Change to your source folder
 DESTINATION_FOLDER = "C:/Users/Lenovo!/Desktop/backup"  # Change to your backup storage path
 #EMAIL_RECIPIENTS = ["harsha@sidpl.in", "accounts@sidpl.in", "srk@sidpl.in"]  # Update with actual emails
 EMAIL_RECIPIENTS = ["harsha@sidpl.in"]
-SMTP_USERNAME = "notificationssidpl@gmail.com"  # Update with your Gmail ID
-SMTP_PASSWORD = "vnhq zosq ufgm vhcu"  # Use an App Password from Google
+SMTP_USERNAME = "xxxxxxx@gmail.com"  # Update with your Gmail ID
+SMTP_PASSWORD = "xxxxxxx"  # Use an App Password from Google
 
 def send_email(subject, body):
     try:
